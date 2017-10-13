@@ -15,7 +15,7 @@ for line in Infile:
 	elif "#" in line:
 	#need to search through the line for all possible combinations of names (regex string)
 	#need to backreference and sub each position in the string
-		re.search(regex string, search string)
-		re.sub(regex string, replacement, search string)
+		re.search([A-Za-z]{2}[0-9]*\.[A-Za-z][0-9]*\., line)
+		re.sub([A-Za-z]{2}[0-9]*\.[A-Za-z][0-9]*\.,(Cf)\.(Sfa)\.,line)
 		Outfile.write(line + "\n")
 	else:
