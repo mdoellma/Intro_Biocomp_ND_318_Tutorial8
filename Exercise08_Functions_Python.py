@@ -51,7 +51,7 @@ var.group(index)
 var.start(index)
 #splits a string on a pattern
 re.split(regexString,searchString)
-#replaces first regex match in search string with replacement
+#replaces regex match in search string with replacement
 re.sub(regexString,replacement,searchString)
 #same as above but also returns number of replacements made
 re.subn(regexString,replacement,searchString)
