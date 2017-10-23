@@ -8,22 +8,29 @@ import re
 vcffile = open("Cflorida.vcf","r")
 outfile = open("CfloridaCounts.txt","w")
 
-#Assigning regex as a variable
-#Names=r""
-#SNPs=r""
+#assign regex to variable name, or compile to variable name
+TX_RE = re.compile(r'cf\w*?\.a\w*?\.(\d{3})', re.IGNORECASE)
+FL_RE = re.compile(r'cf\w*?\.g\w*?\.(\d{3})', re.IGNORECASE)
 
-#Creating a for loop to loop over Cflorida.vcf
-for : # ___ in vcffile
-    line = line.strip()
-    if : #line starts w/##
-    #write name to file
-    elif : #line starts w/#
-    #replace with standard regexes
-    re.sub(r"\N")
-    #write to file
-    else : #this is everything else
-    #change full SNPs to allele counts
-    re.sub(r"\N")
-    #change . to NA using \.
-    re.sub(r"\N")
-    #write new version to file 
+with open('Cflorida.vcf', 'r') as vcffile, open('CfloridaCounts.txt', 'w') as outfile:
+    for line in vcffile:
+        line = line.strip()
+        if line[0:2] == '##': # line = header
+            print(line, file=outfile)
+            continue
+        elif line[0] == '#' and line[1] != '#': # line contains column headings
+            line = line.split('\t')
+            for i in range(len(line)):
+                tx_match, fl_match = TX_RE.match(line[i]), FL_RE.match(line[i])
+                if tx_match: # if match, stdize to texas name convention
+                    line[i] = 'Cf.Sfa.{0}'.format(tx_match.group(1))
+                elif fl_match: # if match, stdize to flordia name convention
+                    line[i] = 'Cf.Gai.{0}'.format(fl_match.group(1))
+                else:
+                    continue
+            '\t'.join(line)
+            print(line, file=outfile)
+        else: #now you're in the data
+            #replace full SNP info with allele counts only
+            #replace missing data with NA
+            #write new version of line to new file
