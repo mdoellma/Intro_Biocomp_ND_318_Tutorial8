@@ -30,13 +30,11 @@ def get_ids():
             else:
                 ID_DICT[line[0]] = line[1]
     return ID_DICT
-
 def find_sequences(ID_DICT, MATCH):
     #A while loop will allow us to skip operating on fastq lines we don't care about
     #it also allows us to read huge files line by line, without storing them in memory
     #read and strip the first line in the file
     pass
-    """
     with open(SEQFILE, 'r') as fastq:
         line = fastq.readline()
         line = line.strip()
@@ -59,7 +57,7 @@ def find_sequences(ID_DICT, MATCH):
             else:
                 #it's a good idea to break loop and print error message if you end up here
                 #this means you've read the wrong number of lines or the input file isn't in the right format (it is!)
-                """
+
 def histogram_etc():
     #Graph histograms of good and bad start positions
     pass
