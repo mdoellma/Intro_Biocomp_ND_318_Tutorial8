@@ -2,6 +2,7 @@
 #Authors: Grant Keller and Kathleen Nicholson
 
 #import packages
+from __future__ import print_function
 import re
 
 #Open files to read and write
@@ -11,15 +12,16 @@ outfile = open("CfloridaCounts.txt","w")
 #assign regex to variable name, or compile to variable name
 TX_RE = re.compile(r'cf\w*?\.a\w*?\.(\d{3})', re.IGNORECASE)
 FL_RE = re.compile(r'cf\w*?\.g\w*?\.(\d{3})', re.IGNORECASE)
+SNP_RE = re.compile(r'^.+?/.+?:(.+?,.+?):.+?:.+?,.+?,.+?$')
 
 with open('Cflorida.vcf', 'r') as vcffile, open('CfloridaCounts.txt', 'w') as outfile:
     for line in vcffile:
         line = line.strip()
-        if line[0:2] == '##': # line = header
-            print(line, file=outfile)
-            continue
+        line = line.split('\t')
+        if line[0][0:2] == '##': # line = header
+            # don't do anything
+            x = None
         elif line[0] == '#' and line[1] != '#': # line contains column headings
-            line = line.split('\t')
             for i in range(len(line)):
                 tx_match, fl_match = TX_RE.match(line[i]), FL_RE.match(line[i])
                 if tx_match: # if match, stdize to texas name convention
@@ -28,9 +30,14 @@ with open('Cflorida.vcf', 'r') as vcffile, open('CfloridaCounts.txt', 'w') as ou
                     line[i] = 'Cf.Gai.{0}'.format(fl_match.group(1))
                 else:
                     continue
-            '\t'.join(line)
-            print(line, file=outfile)
-        else: #now you're in the data
-            #replace full SNP info with allele counts only
-            #replace missing data with NA
-            #write new version of line to new file
+        else:
+            for i in range(len(line)):
+                if SNP_RE.match(line[i]):
+                    snps = SNP_RE.match(line[i])
+                    line[i] = snps.group(1)
+                elif line[i] == './.:.:.:.:.':
+                    line[i] = 'NA'
+                else:
+                    continue
+        line = '\t'.join(line)
+        print(line, file=outfile)
