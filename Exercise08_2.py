@@ -10,6 +10,8 @@ IPYTHON USAGE: run Exercise08_2.py IDFILE FASTQFILE OUTFILE.FASTA
 from __future__ import print_function
 import re
 import sys
+from plotnine import ggplot, aes, xlab, ylab, geom_histogram, ggtitle
+from pandas import DataFrame
 
 try:
     IDFILE = sys.argv[1]
@@ -32,21 +34,28 @@ def get_ids():
     Returns a dictionary from a tab delimited ID file, using the
     DNA barcodes as dict keys, and the sequence IDs as values.
     """
-    ID_DICT = {}
+    id_dict = {}
     with open(IDFILE, 'r') as id_file:
         for line in id_file:
             line = line.strip()
             line = line.split('\t')
-            if line[0] in ID_DICT:
+            if line[0] in id_dict:
                 print('Error - read duplicate ID from {}'.format(IDFILE))
                 sys.exit(1)
             else:
-                ID_DICT[line[0]] = line[1]
-    return ID_DICT
+                id_dict[line[0]] = line[1]
+    return id_dict
 
-def find_sequences(ID_DICT, MATCH):
+def find_sequences(id_dict, regex):
+    """
+    Returns cut site start positions for sequences which can be positively
+    identified, as well as those which cannot. Also outputs identifying info
+    and sequences to FASTA_OUTFILE and returns info for sequences which could
+    not be identified.
+    """
     bad_list = []
-    cutsite_pos_list = []
+    good_cutsite_pos = []
+    bad_cutsite_pos = []
     with open(SEQFILE, 'r') as fastq, open(FASTA_OUTFILE, 'w') as fasta:
         line = fastq.readline()
         line = line.strip()
@@ -54,30 +63,50 @@ def find_sequences(ID_DICT, MATCH):
             if line[0] == '@': # checks for header lines
                 line = fastq.readline() # if so, skip to next line (seq line)
                 line = line.strip()
-                if MATCH.match(line): # is 8bp barcode in seq line?
-                    seq = MATCH.match(line)
-                    if seq.group(2) in ID_DICT.keys():
-                        [None for p in MATCH.finditer(line)] # p holds positions of match object
-                        cut_pos = p.start()+len(seq.group(1))+len(seq.group(2)) # first A in AATTC cut site
-                        cutsite_pos_list.append(cut_pos)
-                        print('> {}'.format(ID_DICT[seq.group(2)]), file=fasta)
+                if regex.match(line): # is 8bp barcode in seq line?
+                    seq = regex.match(line)
+                    # p holds positions of match object
+                    [None for p in regex.finditer(line)]
+                    # first A in AATTC cut site
+                    cut_pos = p.start()+len(seq.group(1))+len(seq.group(2))
+                    if seq.group(2) in id_dict.keys():
+                        good_cutsite_pos.append(cut_pos)
+                        print('> {}'.format(id_dict[seq.group(2)]), file=fasta)
                         print(seq.group(3), file=fasta)
                     else:
                         bad_list.append({'BARCODE':seq.group(2),
                                          'SEQUENCE':seq.group(3)})
+                        bad_cutsite_pos.append(cut_pos)
                 for i in range(3): # skips over +, quality score, next header
                     line = fastq.readline()
-                line = line.strip()                    
+                line = line.strip()
             else:
                 print('Error: First line not header "@" line. Is format fastq?')
                 exit(2)
-    return cutsite_pos_list, bad_list
+    return good_cutsite_pos, bad_cutsite_pos, bad_list
 
-def histogram_etc():
+def histogram_etc(cuts, headline):
+    """
+    Given a Pandas DataFrame, and a title (headline), creates a histogram corresponding
+    to the start point of cutsites in RADseq data.
+    """
+    out_hist = ggplot(cuts, aes(x='cutsites'))
+    xlabel = xlab('Position Restriction Cutpoint Start')
+    ylabel = ylab('Frequency')
+    title = ggtitle(headline)
     #Graph histograms of good and bad start positions
-    pass
+    print(out_hist + geom_histogram(binwidth=5) + xlabel + ylabel + title)
 
 if __name__ == '__main__':
+    # obtain dictionary of IDs and with 8 bp barcodes as keys
     ID_DICT = get_ids()
-    SEQ_MATCH = re.compile(r'(\w*?)([ATCG]{8})AATTC(\w+)$')
-    cutsite_pos_list, bad_list = find_sequences(ID_DICT, SEQ_MATCH)
+    # regex to match sequence lines, capture:
+    # 1: pre-barcode sequence    2: 8bp barcode    3: sequence after cutsite
+    SEQ_MATCH = re.compile(r'^(\w*?)([ATCG]{8})AATTC(\w+)$')
+    # obtains list of cutsites from sequence output to fasta, sequences
+    #     whose info were not found in ID_DICT, and info list of bad sequences.
+    GOOD_CUTSITES, BAD_CUTSITES, BAD_LIST = find_sequences(ID_DICT, SEQ_MATCH)
+    # outputs histogram for "good" cutsites
+    histogram_etc(DataFrame(data=GOOD_CUTSITES, columns=['cutsites']), 'Good Cut Sites')
+    # outputs histogram for "bad" cutsites
+    histogram_etc(DataFrame(data=BAD_CUTSITES, columns=['cutsites']), 'Bad Cut Sites')
