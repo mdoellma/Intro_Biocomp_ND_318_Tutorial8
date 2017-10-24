@@ -8,11 +8,24 @@ IPYTHON USAGE: run Exercise08_2.py IDFILE FASTQFILE OUTFILE.FASTA
 """
 
 from __future__ import print_function
-from sys import exit, argv
+import re
+import sys
 
-IDFILE = argv[1]
-SEQFILE = argv[2]
-FASTA_OUTFILE = argv[3]
+try:
+    IDFILE = sys.argv[1]
+except IndexError:
+    print('USAGE: python Exercise08_2.py IDFILE FASTQFILE OUTFILE.FASTA')
+    IDFILE = raw_input('ID File: ')
+try:
+    SEQFILE = sys.argv[2]
+except IndexError:
+    print('USAGE: python Exercise08_2.py IDFILE FASTQFILE OUTFILE.FASTA')
+    SEQFILE = raw_input('SEQ File: ')
+try:
+    FASTA_OUTFILE = sys.argv[3]
+except IndexError:
+    print('USAGE: python Exercise08_2.py IDFILE FASTQFILE OUTFILE.FASTA')
+    FASTA_OUTFILE = raw_input('Fasta File (Output): ')
 
 def get_ids():
     """
@@ -26,48 +39,45 @@ def get_ids():
             line = line.split('\t')
             if line[0] in ID_DICT:
                 print('Error - read duplicate ID from {}'.format(IDFILE))
-                exit(1)
+                sys.exit(1)
             else:
                 ID_DICT[line[0]] = line[1]
     return ID_DICT
+
 def find_sequences(ID_DICT, MATCH):
-    #A while loop will allow us to skip operating on fastq lines we don't care about
-    #it also allows us to read huge files line by line, without storing them in memory
-    #read and strip the first line in the file
-    pass
-    with open(SEQFILE, 'r') as fastq:
+    bad_list = []
+    cutsite_pos_list = []
+    with open(SEQFILE, 'r') as fastq, open(FASTA_OUTFILE, 'w') as fasta:
         line = fastq.readline()
         line = line.strip()
         while line != "":
             if line[0] == '@': # checks for header lines
                 line = fastq.readline() # if so, skip to next line (seq line)
                 line = line.strip()
-                
-                if : #is your regex in the sequence
-                    #store your regex matches
-                    if : #is your DNA barcode in the ID data frame?
-                        ##append the start position of the AATTC to your vector
-                        #write the fasta header to your file by getting the correct ID from the data frame
-                        #write the sequence remaining to the right of the AATTC cut site to your file
+                if MATCH.match(line): # is 8bp barcode in seq line?
+                    seq = MATCH.match(line)
+                    if seq.group(2) in ID_DICT.keys():
+                        [None for p in MATCH.finditer(line)] # p holds positions of match object
+                        cut_pos = p.start()+len(seq.group(1))+len(seq.group(2)) # first A in AATTC cut site
+                        cutsite_pos_list.append(cut_pos)
+                        print('> {}'.format(ID_DICT[seq.group(2)]), file=fasta)
+                        print(seq.group(3), file=fasta)
                     else:
-                        #Optional: append location of AATTC to "bad" vector (pattern found but no barcode match) as above
+                        bad_list.append({'BARCODE':seq.group(2),
+                                         'SEQUENCE':seq.group(3)})
                 for i in range(3): # skips over +, quality score, next header
-                    line = file.readline()
+                    line = fastq.readline()
                 line = line.strip()                    
             else:
-                #it's a good idea to break loop and print error message if you end up here
-                #this means you've read the wrong number of lines or the input file isn't in the right format (it is!)
+                print('Error: First line not header "@" line. Is format fastq?')
+                exit(2)
+    return cutsite_pos_list, bad_list
 
 def histogram_etc():
     #Graph histograms of good and bad start positions
     pass
 
 if __name__ == '__main__':
-    try:
-        ID_DICT = get_ids()
-        SEQ_CRIT = re.match(r'(()()())')
-        #assign regex to variable name, or compile to variable name
-        # SOME_VAR = find_sequences(ID_DICT, MATCH)
-    except IndexError:
-        print('If you\'re using a Python shell try "run Exercise08_2.py indivIDs.txt seqFastq.fq IDseq.fasta".')
-    
+    ID_DICT = get_ids()
+    SEQ_MATCH = re.compile(r'(\w*?)([ATCG]{8})AATTC(\w+)$')
+    cutsite_pos_list, bad_list = find_sequences(ID_DICT, SEQ_MATCH)
