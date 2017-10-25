@@ -1,6 +1,3 @@
-#Exercise 8
-#Authors: Janice Love and Melissa Stephens
-
 import re
 
 #Open files to read and write
@@ -21,7 +18,6 @@ for line in Infile:
                 Outfile.write(line + "\n")
         elif "#" in line:
         #need to search through the line for all possible combinations of names (regex string)
-	#then replace only the first two sets of information (not the XXX which is unique to each sample)
                 re.search([Cc][Ff][0-9]*\.[Aa][0-9]*\., line)
                 re.sub([Cc][Ff][0-9]*\.[Aa][0-9]*\.,(Cf)\.(Sfa)\.,line)
                 Outfile.write(line + "\n")
