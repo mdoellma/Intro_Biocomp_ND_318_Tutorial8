@@ -24,7 +24,7 @@ for line in vcffile:
     if '##' in line:  #how can you tell if this is the header line?
         outfile.write(line + "\n") #write unchanged header line to file
     elif '#' in line: #how can you tell if this is the line with the column headings?
-        line = re.sub(r"(CF|cf)(\d{2})?\.","Cf.",line) #standardize (replace) sample names with TX and FL regexes
+        line = re.sub(r"(CF|cf)(\d{2})?\.[Aa]\d?\.","Cf.Sfa.",line) #standardize (replace) sample names with TX and FL regexes
         outfile.write(line + "\n") #write new version of line to file
     #else: #now you're in the data
         #replace full SNP info with allele counts only
