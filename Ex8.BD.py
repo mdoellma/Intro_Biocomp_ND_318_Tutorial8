@@ -1,9 +1,7 @@
 #Exercise 8, Python question 1
-#10/13/17, MMD
 
 #Open files to read and write
 
-import pandas
 import re
 vcffile = open("Cflorida.vcf","r")
 outfile = open("CfloridaCounts.txt","w")
@@ -14,18 +12,18 @@ texasnames=r"[Cc][Ff](07)?\.[Aa](2)?"
 floridanames=r"[Cc][Ff]\.[Gg][Aa2](Ii)?"
 regex=r"[01.]/[01.]:([0-9,.]+):[0-9.]+:[0-9.]+:[0-9,.]+"
 
-#loop over file #look at old code to see how you looped over a file
+#loop over file
 for Line in vcffile:
     #strip end of line
     Line = Line.strip()
     
-    #how can you tell if this is the header line?
+    #the header line?
     if "##" in Line: 
     #write unchanged header line to file
         outfile.write(Line + "\n")
     
     elif "#" in Line:
-        #standardize (replace) sample names with TX and FL regexes
+        #standardize sample names with TX and FL regexes
         newnamesTX = re.sub(texasnames,"Cf.Sfa",Line)
         newnamesall = re.sub(floridanames,"Cf.Gai",newnamesTX)
         #write new version of line to file
@@ -42,6 +40,3 @@ for Line in vcffile:
 #Close files
 vcffile.close()
 outfile.close()
-
-
-
