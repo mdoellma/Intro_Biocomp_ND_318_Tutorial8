@@ -14,7 +14,8 @@ outfile = open("CfloridaCounts.txt","w")
 #assign regex to variable name, or compile to variable name
 TXregex = r"(CF|cf)(\d{2})?\.[Aa]\d?\." #only write regex for part of file that needs to be changed
 FLregex = r"(CF|cf)\.[Gg](2|AI|ai)"
-fullSNPregex = r"\d{1,}/\d{1,}:\d{1,},\d{1,}:\d{1,}:\d{1,}:\d{1,},\d{1,},\d{1,}"
+fullSNPregex = r"\d{1,}/\d{1,}:(\d{1,},\d{1,}):\d{1,}:\d{1,}:\d{1,},\d{1,},\d{1,}"
+Missingregex = r"\./\.:\.,\.:\.:\.:\.,\.,\."
 #line = vcffile.readline().strip()
 
 #loop over file
@@ -27,8 +28,8 @@ for line in vcffile: #look at old code to see how you looped over a file
         line = re.sub(FLregex,"Cf.Gai",line) #standardize Florida sample names with regex
         outfile.write(line + "\n") #write new version of line to file
     else: #now you're in the data
-        line = re.sub(,"",line) #replace full SNP info with allele counts only
-        line = re.sub(,"NA",line) #replace missing data with NA
+        line = re.sub(fullSNPregex,r"\1",line) #replace full SNP info with allele counts only
+        line = re.sub(Missingregex,"NA",line) #replace missing data with NA
         outfile.write(line + "\n") #write new version of line to new file
         
 #Close files
