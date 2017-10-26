@@ -9,8 +9,10 @@ vcffile = open("Cflorida.vcf","r")
 outfile = open("CfloridaCounts.txt","w")
 
 # Set variables of regular expressions
-r1=r"[Cc][Ff][0-9]?/.[Aa][2]?/.([0-9]{3})"
-r2=r"[Cc][Ff][0-9]?/.[Gg].?/.([0-9]{3})"
+reg1=r"[Cc].{1,3}\.[a|A][0-9]?\.([0-9]{3})"
+reg2=r"[Cc].{1,3}\.[g|G].{1,2}\.([0-9]{3})"
+reg3=r"[0|1]\/[0|1]\:([0-9]{1,3}\,[0-9]{1,3})\:[0-9]{1,3}\:[0-9]{1,3}\:[0-9]{1,3}\,[0-9]{1,3}\,[0-9]{1,3}"
+reg4=r"\.\/\.\:\.\:\.\:\.\:\."
 
 
 #loop over file
@@ -20,18 +22,19 @@ for Line in vcffile:
         outfile.write(Line + "\n") # write unchanged header line to file
     elif '#CHROM' in Line: #how can you tell if this is the line with the column headings?
         #standardize (replace) sample names with TX and FL regexes
-        outfile.write(Line + "\n") 
-    else:
-        Line_v2=re.sub(r1, "Cf.Sfa./1", Line)
-        Line_v3=re.sub(r2, "Cf.Gai./1", Line_v2)
+        Line_v2=re.sub(reg1, "Cf.Sfa.\g<1>", Line)
+        Line_v3=re.sub(reg2, "Cf.Gai.\g<1>", Line_v2)
         #write new version of line to file
         outfile.write(Line_v3 + "\n") 
     else: #now you're in the data
-        #replace full SNP info with allele counts only
+        Line_v2=re.sub(reg3, "\g<1>", Line)#replace full SNP info with allele counts only
+        Line_v3=re.sub(reg4, "NA", Line_v2)
         #replace missing data with NA
         #write new version of line to new file
-        
-#Close files
+        outfile.write(Line_v3 + "\n")
+outfile.close() #Close files
+vcffile.close()
+
 
 
 
