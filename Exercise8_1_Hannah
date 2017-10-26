@@ -15,7 +15,7 @@ outfile = open("CfloridaCounts.txt","w")
 TXregex = r"(CF|cf)(\d{2})?\.[Aa]\d?\." #only write regex for part of file that needs to be changed
 FLregex = r"(CF|cf)\.[Gg](2|AI|ai)"
 fullSNPregex = r"\d{1,}/\d{1,}:(\d{1,},\d{1,}):\d{1,}:\d{1,}:\d{1,},\d{1,},\d{1,}"
-Missingregex = r"\./\.:\.,\.:\.:\.:\.,\.,\."
+Missingregex = r"\./\.:\.:\.:\.:\."
 #line = vcffile.readline().strip()
 
 #loop over file
