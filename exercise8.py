@@ -22,14 +22,10 @@ for Line in vcffile:
         #standardize (replace) sample names with TX and FL regexes
         outfile.write(Line + "\n") 
     else:
-        print("finished!")
-        outfile.close()
-###############
-
-        Line2=re.sub(r1, "Cf.Sfa./1", Line)
-        Line3=re.sub(r2, "Cf.Gai./1", Line2)
+        Line_v2=re.sub(r1, "Cf.Sfa./1", Line)
+        Line_v3=re.sub(r2, "Cf.Gai./1", Line_v2)
         #write new version of line to file
-        print(Line3)
+        outfile.write(Line_v3 + "\n") 
     else: #now you're in the data
         #replace full SNP info with allele counts only
         #replace missing data with NA
