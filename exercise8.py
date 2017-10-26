@@ -1,10 +1,10 @@
 #### Tutorial 8
 # Set wd for Brittni: 
-os.chdir('/Users/brittnibertolet/Desktop/bcTutorials/Intro_Biocomp_ND_318_Tutorial8/')
-
-
+#os.chdir('/Users/brittnibertolet/Desktop/bcTutorials/Intro_Biocomp_ND_318_Tutorial8/')
+#set working directory with necessary files
+#load packages
 import re
-
+#load files
 vcffile = open("Cflorida.vcf","r")
 outfile = open("CfloridaCounts.txt","w")
 
