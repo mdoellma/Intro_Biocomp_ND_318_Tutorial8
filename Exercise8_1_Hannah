@@ -14,7 +14,7 @@ outfile = open("CfloridaCounts.txt","w")
 #assign regex to variable name, or compile to variable name
 TXregex = r"(CF|cf)(\d{2})?\.[Aa]\d?\." #only write regex for part of file that needs to be changed
 FLregex = r"(CF|cf)\.[Gg](2|AI|ai)"
-fullSNPregex = r"
+fullSNPregex = r"\d{1,}/\d{1,}:\d{1,},\d{1,}:\d{1,}:\d{1,}:\d{1,},\d{1,},\d{1,}"
 #line = vcffile.readline().strip()
 
 #loop over file
