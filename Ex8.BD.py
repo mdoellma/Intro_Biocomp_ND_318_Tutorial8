@@ -4,26 +4,44 @@
 #Open files to read and write
 
 import pandas
+import re
 vcffile = open("Cflorida.vcf","r")
 outfile = open("CfloridaCounts.txt","w")
 
 #assign regex to variable name, or compile to variable name
-ognames=re.search([Cc][Ff](07)?\.[Aa](2)?\.\d{3})
 
-#loop over file
-for :#look at old code to see how you looped over a file
+texasnames=r"[Cc][Ff](07)?\.[Aa](2)?"
+floridanames=r"[Cc][Ff]\.[Gg][Aa2](Ii)?"
+regex=r"[01.]/[01.]:([0-9,.]+):[0-9.]+:[0-9.]+:[0-9,.]+"
+
+#loop over file #look at old code to see how you looped over a file
+for Line in vcffile:
     #strip end of line
-    if : #how can you tell if this is the header line?
-        #write unchanged header line to file
-    elif : #how can you tell if this is the line with the column headings?
+    Line = Line.strip()
+    
+    #how can you tell if this is the header line?
+    if "##" in Line: 
+    #write unchanged header line to file
+        outfile.write(Line + "\n")
+    
+    elif "#" in Line:
         #standardize (replace) sample names with TX and FL regexes
+        newnamesTX = re.sub(texasnames,"Cf.Sfa",Line)
+        newnamesall = re.sub(floridanames,"Cf.Gai",newnamesTX)
         #write new version of line to file
-    else: #now you're in the data
+        outfile.write(newnamesall + "\n")
+    
+    else:
         #replace full SNP info with allele counts only
+        AC=re.sub(regex,r"\1",Line)
         #replace missing data with NA
+        ACNA=re.sub(r"\.","NA",AC)
         #write new version of line to new file
-        
+        outfile.write(ACNA + "\n")
+
 #Close files
+vcffile.close()
+outfile.close()
 
 
 
