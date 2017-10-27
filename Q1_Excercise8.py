@@ -8,11 +8,9 @@ Infile=open("Cflorida.vcf","r")
 Outfile=open("CfloridaCounts.txt","w")
 
 #set variables
-<<<<<<< HEAD
 TxString=r"[Cc][Ff][0-9]*\.[Aa][0-9]*\."
 FlString=r"[Cc][Ff]\.[Gg][Aa]*[A-Za-z]*[0-9]*\."
 part2 = r"[-1.]/[01.]:([0-9},.]+):[0-9.]+:[0-9.]+:[0-9,.]+"
->>>>>>> ab951ee4df36bf3f15db7c670bb5d51c9b20532c
 
 #for loop
 for line in Infile:
@@ -22,9 +20,8 @@ for line in Infile:
         elif "#" in line:
         #need to search through the line for all possible combinations of names (regex string)
 	#then replace only the first two sets of information (not the XXX which is unique to each sample)
-<<<<<<< HEAD
-                newTXstring = re.sub(TxString, "Cf.Sfa", line)
-                newNamesFinal = re.sub(FlString, "Cf.Gai", newTXstring)
+                newTXstring = re.sub(TxString, "Cf.Sfa.", line)
+                newNamesFinal = re.sub(FlString, "Cf.Gai.", newTXstring)
                 Outfile.write(newNamesFinal + "\n")
     
         else: #the rest of the data: SNP, allele counts
@@ -39,4 +36,3 @@ for line in Infile:
 
 Infile.close()
 Outfile.close()
->>>>>>> ab951ee4df36bf3f15db7c670bb5d51c9b20532c
